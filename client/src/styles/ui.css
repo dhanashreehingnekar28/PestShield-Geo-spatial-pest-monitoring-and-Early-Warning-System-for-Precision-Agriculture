@@ -1,0 +1,18 @@
+.back-btn { display: inline-flex; align-items: center; gap: 6px; margin: 0 0 12px; padding: 7px 12px; border: 1px solid #c9d4ca; border-radius: 8px; background: #fff; color: #1f2a1f; font: inherit; font-size: 0.9rem; cursor: pointer; }
+.back-btn:hover { border-color: #2f6d3e; }
+.back-btn:focus-visible, .ui-popup-btn:focus-visible { outline: 3px solid #8fc29a; outline-offset: 2px; }
+
+.ui-overlay { position: fixed; inset: 0; background: rgba(20,30,22,0.5); display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 100; }
+.ui-popup { background: #fff; border-radius: 12px; padding: 24px; width: 100%; max-width: 380px; text-align: center; box-shadow: 0 8px 28px rgba(0,0,0,0.25); }
+.ui-popup-icon { width: 48px; height: 48px; margin: 0 auto 10px; border-radius: 50%; background: #e1f3e6; color: #1a7f37; font-size: 1.6rem; line-height: 48px; }
+.ui-popup h2 { margin: 0 0 6px; font-size: 1.15rem; }
+.ui-popup p { margin: 0 0 14px; color: #5b6b60; font-size: 0.9rem; }
+.ui-popup-btn { padding: 9px 16px; border-radius: 8px; border: 1px solid #2f6d3e; background: #2f6d3e; color: #fff; font: inherit; cursor: pointer; }
+
+/* ---------- Navbar: one clean row ---------- */
+.navbar { display: flex; flex-wrap: nowrap; align-items: center; justify-content: space-between; gap: 16px; }
+.navbar .brand { flex: 0 0 auto; white-space: nowrap; }
+.navbar .nav-links { display: flex; flex-wrap: nowrap; align-items: center; justify-content: flex-end; gap: 14px; margin-left: auto; min-width: 0; overflow-x: auto; scrollbar-width: none; }
+.navbar .nav-links::-webkit-scrollbar { display: none; }
+.navbar .nav-links a, .navbar .nav-links button { flex: 0 0 auto; white-space: nowrap; margin: 0; }
+@media (max-width: 1100px) { .navbar { gap: 10px; } .navbar .nav-links { gap: 10px; font-size: 0.88rem; } }

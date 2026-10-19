@@ -1,0 +1,73 @@
+.rd-open { align-self: flex-start; margin-top: 4px; background: none; border: none; padding: 0; color: #2f6d3e; font: inherit; font-size: 0.86rem; text-decoration: underline; cursor: pointer; }
+.rd-open:focus-visible { outline: 3px solid #8fc29a; outline-offset: 2px; }
+
+.rd-overlay { position: fixed; inset: 0; background: rgba(20,30,22,0.5); display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 60; }
+.rd-modal { background: #fff; border-radius: 12px; width: 100%; max-width: 720px; max-height: 92vh; display: flex; flex-direction: column; overflow: hidden; }
+.rd-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; padding: 18px 22px 12px; border-bottom: 1px solid #edf1ed; }
+.rd-head h2 { margin: 0 0 4px; font-size: 1.3rem; text-transform: capitalize; }
+.rd-sub { margin: 0; font-size: 0.88rem; color: #5b6b60; }
+.rd-head-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.rd-status { font-size: 0.78rem; padding: 3px 10px; border-radius: 99px; white-space: nowrap; }
+.rd-status.st-Verified { background: #e1f3e6; color: #1a7f37; }
+.rd-status.st-Pending { background: #fdf0d2; color: #8a5a00; }
+.rd-status.st-Rejected { background: #fcd5d3; color: #9c1f1b; }
+.rd-x { background: none; border: 1px solid #c9d4ca; border-radius: 8px; width: 34px; height: 34px; font-size: 1.3rem; line-height: 1; color: #333; cursor: pointer; }
+.rd-x:hover:not(:disabled) { border-color: #2f6d3e; }
+
+.rd-body { padding: 8px 22px 6px; overflow-y: auto; }
+.rd-photo { margin: 10px 0 4px; }
+.rd-photo img { display: block; width: 100%; max-height: 340px; object-fit: contain; background: #eef1ee; border-radius: 8px; }
+.rd-noimg { background: #eef1ee; color: #5b6b60; border-radius: 8px; padding: 28px 12px; text-align: center; font-size: 0.9rem; }
+
+.rd-section { padding: 10px 0; border-bottom: 1px solid #f0f3f0; }
+.rd-section:last-child { border-bottom: none; }
+.rd-section h3 { margin: 0 0 6px; font-size: 1rem; color: #2f6d3e; }
+.rd-section dl { margin: 0; }
+.rd-row { display: grid; grid-template-columns: 130px 1fr; gap: 10px; padding: 4px 0; font-size: 0.92rem; }
+.rd-row dt { color: #5b6b60; }
+.rd-row dd { margin: 0; overflow-wrap: anywhere; white-space: pre-line; }
+.rd-conf { display: inline-flex; align-items: center; gap: 8px; margin-left: 10px; font-size: 0.84rem; color: #1a5c2c; }
+.rd-conf.low { color: #8a5a00; }
+.rd-conf-bar { display: inline-block; width: 80px; height: 8px; background: #edf1ed; border-radius: 99px; overflow: hidden; }
+.rd-conf-bar span { display: block; height: 100%; background: #2f6d3e; }
+.rd-conf.low .rd-conf-bar span { background: #e0a100; }
+.rd-note { margin: 6px 0 2px; padding: 8px 10px; border-radius: 8px; font-size: 0.86rem; }
+.rd-note.warn { background: #fdf3e0; color: #8a5a00; }
+.rd-note.ok { background: #e6f4ea; color: #1a5c2c; }
+.rd-loc { margin: 0; font-size: 0.92rem; }
+.rd-loc a { color: #2f6d3e; }
+
+.rd-foot { padding: 12px 22px; border-top: 1px solid #edf1ed; }
+.rd-err { margin: 0 0 8px; padding: 8px 10px; border-radius: 8px; background: #fdecea; color: #a12622; font-size: 0.88rem; }
+.rd-actions { display: flex; justify-content: flex-end; align-items: center; gap: 8px; flex-wrap: wrap; }
+.rd-done { margin-right: auto; font-size: 0.88rem; color: #5b6b60; }
+.rd-btn { padding: 9px 16px; border-radius: 8px; border: 1px solid #c9d4ca; background: #fff; font: inherit; font-size: 0.92rem; cursor: pointer; }
+.rd-btn.ok { background: #1a7f37; border-color: #1a7f37; color: #fff; }
+.rd-btn.no { background: #b3261e; border-color: #b3261e; color: #fff; }
+.rd-btn:disabled, .rd-x:disabled { opacity: 0.55; cursor: wait; }
+.rd-modal button:focus-visible, .rd-modal a:focus-visible { outline: 3px solid #8fc29a; outline-offset: 2px; }
+
+@media (max-width: 520px) {
+  .rd-head, .rd-body, .rd-foot { padding-left: 14px; padding-right: 14px; }
+  .rd-row { grid-template-columns: 1fr; gap: 0; }
+  .rd-actions .rd-btn { flex: 1; }
+  .rd-modal { max-height: 96vh; }
+}
+
+/* Embedded map in admin report details */
+
+.rd-section .leaflet-container {
+  width: 100%;
+  height: 300px;
+  border-radius: 10px;
+  z-index: 0;
+}
+
+.rd-section .leaflet-control-container {
+  font-size: 12px;
+}
+
+.rd-section .leaflet-popup-content {
+  font-size: 13px;
+  line-height: 1.6;
+}

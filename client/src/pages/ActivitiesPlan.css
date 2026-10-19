@@ -1,0 +1,16 @@
+.fa-sec { margin: 1.5rem 0 .6rem; font-size: 1.15rem; display: flex; align-items: center; gap: .6rem; }
+.fa-count { font-size: .8rem; font-weight: 600; background: #e6efe8; color: #12352a; padding: .1rem .55rem; border-radius: 999px; }
+.fa-count.over { background: #fbe3df; color: #8a1f11; }
+.fa-badge { display: inline-block; font-size: .75rem; font-weight: 600; padding: .1rem .5rem; border-radius: 4px; margin-left: .4rem; background: #e6efe8; color: #12352a; }
+.fa-badge.over { background: #8a1f11; color: #fff; }
+.fa-badge.pest { background: #f6e7b8; color: #5c4710; }
+.fa-item.overdue { border-left: 5px solid #8a1f11; }
+.fa-period { display: block; font-size: .85rem; color: #4d5f54; margin-top: .15rem; }
+.fa-why { margin: .35rem 0 0; font-size: .92rem; }
+.fa-tools .done-btn { background: #12352a; color: #fff; border-color: #12352a; }
+.fa-check { display: flex; align-items: center; gap: .5rem; margin-top: .6rem; }
+.fa-check input { width: auto; }
+.fa-item.is-done { opacity: .75; }
+
+.fa-sow { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; margin: .6rem 0; }
+.fa-sow label { font-weight: 600; }

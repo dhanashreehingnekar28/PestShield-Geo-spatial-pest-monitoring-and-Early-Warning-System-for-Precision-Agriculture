@@ -1,0 +1,62 @@
+/* Pest Library: symptoms and treatment popup. Colours follow AdminPests.css. */
+.pdm-overlay { position: fixed; inset: 0; background: rgba(20,30,22,0.5); display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 100; }
+
+.pdm { --pdm-accent: #2f6d3e; background: #fff; color: #1f2a1f; border-radius: 12px; border-top: 5px solid var(--pdm-accent); width: 100%; max-width: 760px; max-height: 90vh; max-height: 90dvh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 8px 28px rgba(0,0,0,0.25); animation: pdm-in 140ms ease-out; }
+.pdm.pdm-crop-Groundnut { --pdm-accent: #b7791f; }
+.pdm.pdm-crop-Potato { --pdm-accent: #7a5c3a; }
+.pdm.pdm-crop-Chilli { --pdm-accent: #c0392b; }
+
+.pdm-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; padding: 16px 22px 12px; border-bottom: 1px solid #e3e9e4; }
+.pdm-head h2 { margin: 0 0 4px; font-size: 1.35rem; letter-spacing: -0.01em; text-transform: capitalize; }
+.pdm-meta { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; font-size: 0.86rem; color: #5b6b60; }
+.pdm-crop { padding: 2px 10px; border-radius: 99px; border: 1px solid var(--pdm-accent); color: var(--pdm-accent); font-weight: 600; }
+.pdm-note { color: #1a5c2c; }
+.pdm-x { flex: 0 0 auto; width: 36px; height: 36px; border: 1px solid #c9d4ca; background: #fff; border-radius: 8px; font: inherit; font-size: 1.4rem; line-height: 1; color: #1f2a1f; cursor: pointer; }
+.pdm-x:hover { border-color: #2f6d3e; }
+
+.pdm-body { flex: 1 1 auto; overflow-y: auto; overscroll-behavior: contain; padding: 4px 22px 18px; }
+.pdm-desc { margin: 14px 0 0; font-size: 0.97rem; line-height: 1.5; }
+.pdm-empty { margin: 18px 0; padding: 14px; background: #f4f7f4; border: 1px dashed #c9d4ca; border-radius: 8px; color: #4a5a4e; }
+
+.pdm-facts { margin: 14px 0 0; display: grid; grid-template-columns: 1fr; gap: 10px; }
+.pdm-facts div { background: #f4f7f4; border-radius: 8px; padding: 10px 12px; }
+.pdm-facts dt { font-size: 0.82rem; font-weight: 600; color: #5b6b60; margin: 0 0 2px; }
+.pdm-facts dd { margin: 0; font-size: 0.92rem; line-height: 1.45; }
+
+.pdm-sec { margin-top: 20px; }
+.pdm-sec h3 { margin: 0 0 8px; padding-bottom: 5px; font-size: 1.02rem; border-bottom: 1px solid #e3e9e4; }
+.pdm-list { margin: 0; padding-left: 1.25em; font-size: 0.93rem; line-height: 1.5; }
+.pdm-list li { margin: 5px 0; padding-left: 2px; }
+.pdm-list li::marker { color: var(--pdm-accent); }
+
+.pdm-cols { display: grid; grid-template-columns: 1fr; gap: 12px; }
+.pdm-card { background: rgba(47,109,62,0.07); border-radius: 8px; padding: 10px 14px 6px; }
+.pdm-card-adv { background: #fbf1e3; }
+.pdm-card h4 { margin: 0 0 4px; font-size: 0.92rem; }
+
+.pdm-warn { background: #fff6e5; border-left: 4px solid #b7791f; border-radius: 8px; padding: 10px 14px 8px; }
+.pdm-warn h3 { border-bottom: none; padding-bottom: 0; margin-bottom: 4px; }
+
+.pdm-foot { display: flex; justify-content: space-between; align-items: center; gap: 14px; padding: 12px 22px; border-top: 1px solid #e3e9e4; background: #fafcfa; }
+.pdm-foot p { margin: 0; font-size: 0.8rem; color: #5b6b60; line-height: 1.4; }
+.pdm-close { flex: 0 0 auto; padding: 9px 18px; border-radius: 8px; border: 1px solid #2f6d3e; background: #2f6d3e; color: #fff; font: inherit; font-size: 0.92rem; cursor: pointer; }
+.pdm-close:hover { background: #265a33; }
+
+.pdm-x:focus-visible, .pdm-close:focus-visible { outline: 3px solid #8fc29a; outline-offset: 2px; }
+
+@media (min-width: 640px) {
+  .pdm-facts { grid-template-columns: 1fr 1fr; }
+  .pdm-cols { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 560px) {
+  .pdm-overlay { padding: 0; align-items: flex-end; }
+  .pdm { max-height: 94vh; max-height: 94dvh; border-radius: 14px 14px 0 0; }
+  .pdm-head, .pdm-foot { padding-left: 16px; padding-right: 16px; }
+  .pdm-body { padding-left: 16px; padding-right: 16px; }
+  .pdm-foot { flex-direction: column-reverse; align-items: stretch; }
+  .pdm-close { width: 100%; padding: 11px 18px; }
+}
+
+@keyframes pdm-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .pdm { animation: none; } }

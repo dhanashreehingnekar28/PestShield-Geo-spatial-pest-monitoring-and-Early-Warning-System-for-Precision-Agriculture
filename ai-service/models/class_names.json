@@ -1,0 +1,28 @@
+{
+  "groundnut": [
+    "GROUNDNUT_ALTERNARIA LEAF SPOT",
+    "GROUNDNUT_HEALTHY",
+    "GROUNDNUT_LEAF SPOT (EARLY AND LATE)",
+    "GROUNDNUT_ROSETTE",
+    "GROUNDNUT_RUST"
+  ],
+  "potato": [
+    "Potato_Bacteria",
+    "Potato_Fungi",
+    "Potato_Healthy",
+    "Potato_Nematode",
+    "Potato_Pest",
+    "Potato_Phytopthora",
+    "Potato_Virus"
+  ],
+  "chilli": [
+    "Chilli __Whitefly",
+    "Chilli __Yellowish",
+    "Chilli__Anthracnos",
+    "Chilli__Damping_Off",
+    "Chilli__Leaf_Curl_Virus",
+    "Chilli__Leaf_Spot",
+    "Chilli__Veinal_Mottle_Virus",
+    "Chilli___healthy"
+  ]
+}

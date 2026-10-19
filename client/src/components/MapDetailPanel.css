@@ -1,0 +1,34 @@
+/* Sits on top of the map (the map wrapper must be position: relative) */
+.md-panel { position: absolute; top: 12px; right: 12px; bottom: 30px; width: 340px; max-width: calc(100% - 24px); background: #fff; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.28); z-index: 1100; display: flex; flex-direction: column; overflow: hidden; }
+.md-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 12px 14px 10px; border-bottom: 1px solid #edf1ed; }
+.md-head h3 { margin: 0 0 6px; font-size: 1.02rem; }
+.md-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+.md-badge { font-size: 0.74rem; padding: 2px 9px; border-radius: 99px; color: #fff; }
+.md-badge.status { background: #e1f3e6; color: #1a7f37; }
+.md-badge.status.done { background: #eceeed; color: #5b6b60; }
+.md-x { background: none; border: 1px solid #c9d4ca; border-radius: 8px; width: 30px; height: 30px; font-size: 1.2rem; line-height: 1; cursor: pointer; flex-shrink: 0; }
+.md-x:hover { border-color: #2f6d3e; }
+.md-body { padding: 4px 14px 12px; overflow-y: auto; }
+.md-body section { padding: 8px 0; border-bottom: 1px solid #f0f3f0; }
+.md-body section:last-child { border-bottom: none; }
+.md-body h4 { margin: 0 0 6px; font-size: 0.9rem; color: #2f6d3e; }
+.md-body p { margin: 4px 0; font-size: 0.88rem; overflow-wrap: anywhere; }
+.md-body dl { margin: 0; }
+.md-row { display: grid; grid-template-columns: 105px 1fr; gap: 8px; padding: 3px 0; font-size: 0.86rem; }
+.md-row dt { color: #5b6b60; }
+.md-row dd { margin: 0; overflow-wrap: anywhere; white-space: pre-line; }
+.md-note { background: rgba(47,109,62,0.07); border-radius: 8px; padding: 6px 9px; font-size: 0.82rem !important; color: #3a4a3e; }
+.md-muted { color: #5b6b60; font-size: 0.82rem !important; }
+.md-conf.low { color: #8a5a00; }
+.md-photo { display: block; width: 100%; max-height: 190px; object-fit: cover; border-radius: 8px; margin: 8px 0 2px; background: #eef1ee; }
+.md-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.md-list button { width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 8px; text-align: left; background: #f6f9f6; border: 1px solid #dfe8e0; border-radius: 8px; padding: 7px 10px; font: inherit; font-size: 0.86rem; cursor: pointer; }
+.md-list button:hover { border-color: #2f6d3e; }
+.md-list small { color: #5b6b60; white-space: nowrap; }
+.md-bullets { margin: 0; padding-left: 18px; font-size: 0.86rem; }
+.md-bullets li { margin-bottom: 4px; }
+.md-panel button:focus-visible, .md-panel a:focus-visible { outline: 3px solid #8fc29a; outline-offset: 2px; }
+
+@media (max-width: 700px) {
+  .md-panel { top: auto; left: 8px; right: 8px; bottom: 30px; width: auto; max-width: none; max-height: 62%; }
+}

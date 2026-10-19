@@ -1,0 +1,85 @@
+.dashboard-shell {
+  --dash-green: #176b45;
+  --dash-green-dark: #0f5134;
+  --dash-green-soft: #eaf5ec;
+  display: grid;
+  grid-template-columns: 258px minmax(0, 1fr);
+  width: 100%;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+  color: #24362b;
+  background: #f6f9f6;
+}
+.dashboard-sidebar {
+  position: relative;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  height: 100%;
+  padding: 24px 16px 18px;
+  overflow-y: auto;
+  border-right: 1px solid #e0e9e1;
+  background: linear-gradient(180deg, #fff 0%, #f6faf6 100%);
+}
+.dashboard-brand { display: inline-flex; width: max-content; max-width: 100%; align-items: center; padding: 3px 6px 27px; text-decoration: none; }
+.dashboard-side-caption { padding: 0 12px 11px; color: #829087; font-size: .66rem; font-weight: 750; letter-spacing: .14em; }
+.dashboard-side-nav { display: grid; gap: 5px; }
+.dashboard-side-link { position: relative; display: flex; min-height: 46px; align-items: center; gap: 12px; padding: 0 12px; border-radius: 10px; color: #58675d; font-size: .9rem; font-weight: 550; text-decoration: none; transition: color .16s ease, background .16s ease, transform .16s ease; }
+.dashboard-side-link:hover { color: var(--dash-green-dark); background: #eef6ef; transform: translateX(2px); }
+.dashboard-side-link.active { color: var(--dash-green-dark); background: #e8f3e9; font-weight: 700; box-shadow: inset 3px 0 #34865b; }
+.dashboard-side-link > svg { flex: 0 0 auto; color: #839187; }
+.dashboard-side-link.active > svg { color: var(--dash-green); }
+.dashboard-side-plus { display: grid; width: 23px; height: 23px; place-items: center; margin-left: auto; border-radius: 7px; color: #fff; background: var(--dash-green); font-size: 1.1rem; line-height: 1; }
+.dashboard-sidebar-note { display: flex; align-items: center; gap: 11px; margin: auto 2px 14px; padding: 14px 12px; border: 1px solid #dfebdf; border-radius: 12px; color: #748177; background: rgba(255,255,255,.82); font-size: .72rem; line-height: 1.55; }
+.dashboard-sidebar-note b { color: #354a3b; font-size: .78rem; font-weight: 650; }
+.dashboard-live-dot { position: relative; width: 9px; height: 9px; flex: 0 0 auto; border-radius: 50%; background: #44a46b; box-shadow: 0 0 0 4px #e6f4e9; }
+.dashboard-sidebar-logout { display: flex; min-height: 44px; align-items: center; gap: 12px; padding: 0 12px; border: 0; border-radius: 9px; color: #65736a; background: transparent; text-align: left; cursor: pointer; }
+.dashboard-sidebar-logout:hover { color: #a53c37; background: #fff0ef; }
+.dashboard-main-column { display: flex; min-width: 0; min-height: 0; flex-direction: column; }
+.dashboard-topbar { position: relative; z-index: 10; display: flex; height: 76px; flex: 0 0 76px; align-items: center; gap: 16px; padding: 0 clamp(20px, 3vw, 38px); border-bottom: 1px solid #e3ebe4; background: rgba(255,255,255,.94); }
+.dashboard-topbar-title { display: flex; min-width: 0; flex-direction: column; gap: 3px; }
+.dashboard-topbar-title > span { color: #34463a; font-size: .92rem; font-weight: 700; }
+.dashboard-topbar-title small { overflow: hidden; color: #839087; font-size: .72rem; text-overflow: ellipsis; white-space: nowrap; }
+.dashboard-profile { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+.dashboard-avatar { display: grid; width: 38px; height: 38px; flex: 0 0 auto; place-items: center; border: 1px solid #d6e9d9; border-radius: 50%; color: #216743; background: linear-gradient(145deg, #eaf6eb, #d7eddb); font-size: .78rem; font-weight: 750; }
+.dashboard-profile > span:nth-child(2) { display: flex; min-width: 0; flex-direction: column; gap: 2px; }
+.dashboard-profile b { max-width: 190px; overflow: hidden; color: #35463a; font-size: .78rem; text-overflow: ellipsis; white-space: nowrap; }
+.dashboard-profile small { color: #839087; font-size: .68rem; }
+.dashboard-top-logout, .dashboard-menu-toggle { display: grid; width: 40px; height: 40px; flex: 0 0 auto; place-items: center; border: 1px solid #e0e9e1; border-radius: 10px; color: #67756c; background: #fff; cursor: pointer; }
+.dashboard-top-logout:hover, .dashboard-menu-toggle:hover { color: var(--dash-green-dark); border-color: #b8d3bd; background: #f2f8f2; }
+.dashboard-menu-toggle { display: none; }
+.dashboard-scroll-area { min-width: 0; min-height: 0; flex: 1 1 auto; overflow: auto; overscroll-behavior: contain; scrollbar-color: #a8c7ad #edf3ee; scrollbar-width: thin; }
+.dashboard-scroll-area::-webkit-scrollbar, .dashboard-sidebar::-webkit-scrollbar { width: 10px; }
+.dashboard-scroll-area::-webkit-scrollbar-track, .dashboard-sidebar::-webkit-scrollbar-track { background: #edf3ee; }
+.dashboard-scroll-area::-webkit-scrollbar-thumb, .dashboard-sidebar::-webkit-scrollbar-thumb { border: 2px solid #edf3ee; border-radius: 99px; background: #a8c7ad; }
+.dashboard-scroll-area::-webkit-scrollbar-thumb:hover, .dashboard-sidebar::-webkit-scrollbar-thumb:hover { background: #79a983; }
+.dashboard-scroll-area > .db { width: min(100%, 1320px); max-width: none; margin: 0 auto; padding: 28px clamp(20px, 3vw, 38px) 54px; }
+.dashboard-scroll-area > .db .db-head { margin-bottom: 25px; }
+.dashboard-scrim { display: none; }
+
+@media (max-width: 1050px) {
+  .dashboard-shell { grid-template-columns: 228px minmax(0, 1fr); }
+  .dashboard-sidebar { padding-inline: 12px; }
+  .dashboard-topbar { padding-inline: 22px; }
+  .dashboard-scroll-area > .db { padding-inline: 22px; }
+}
+@media (max-width: 760px) {
+  .dashboard-shell { display: block; }
+  .dashboard-sidebar { position: fixed; inset: 0 auto 0 0; width: min(290px, calc(100vw - 54px)); height: 100dvh; transform: translateX(-102%); transition: transform .24s ease; box-shadow: 16px 0 36px rgba(25, 51, 33, .12); }
+  .dashboard-menu-open .dashboard-sidebar { transform: translateX(0); }
+  .dashboard-scrim { position: fixed; inset: 0; z-index: 25; display: block; width: 100%; height: 100%; border: 0; background: rgba(27, 46, 32, .34); }
+  .dashboard-main-column { height: 100%; }
+  .dashboard-topbar { height: 66px; flex-basis: 66px; gap: 11px; padding-inline: 14px; }
+  .dashboard-menu-toggle { display: grid; width: 38px; height: 38px; }
+  .dashboard-topbar-title small { max-width: 44vw; }
+  .dashboard-profile { gap: 8px; }
+  .dashboard-profile > span:nth-child(2) { display: none; }
+  .dashboard-avatar { width: 34px; height: 34px; }
+  .dashboard-top-logout { width: 36px; height: 36px; }
+  .dashboard-scroll-area > .db { padding: 19px 14px 36px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-sidebar, .dashboard-side-link { transition: none; }
+}
