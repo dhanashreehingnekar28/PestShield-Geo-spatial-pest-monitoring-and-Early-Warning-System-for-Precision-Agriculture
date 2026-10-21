@@ -1,152 +1,195 @@
-# PestShield — 3 terminals
-cd client
-npm run dev
+# PestShield
 
-cd server 
-npm run dev
+PestShield is a precision-agriculture web application for monitoring pest reports, crop health, farm activity, and location-based outbreak risk. It combines a React web client, a Node.js/Express API backed by MongoDB, and an optional Python AI image-classification service.
 
-cd ai-service
-venv\Scripts\activate
-python -m uvicorn app:app --reload --port 8000
+## Features
 
-Auth, farms, crop lifecycle, pest library,
-and pest reporting (with photo upload) all work end-to-end. AI fields already
-exist on the report schema
+- Farmer and administrator accounts with role-based access.
+- Farm and crop management, with crop lifecycle guidance.
+- Pest and disease reporting with photo uploads and report status tracking.
+- Optional AI-assisted image predictions during reporting.
+- Administrator report review, pest library maintenance, and user management.
+- Outbreak alerts, map views, weather context, and field activity planning.
+- English-only responsive interface.
 
-## Folder structure
+## Project structure
 
+```text
 pestshield-app/
-├── server/                        # Express + MongoDB API
-│   ├── server.js                  # entry point
-│   ├── config/db.js               # MongoDB connection
-│   ├── models/                    # User, Farm, Pest, PestReport
-│   ├── middleware/                # auth.js (JWT), upload.js (multer)
-│   ├── controllers/                # route logic
-│   ├── routes/                    # route definitions
-│   ├── data/                      # cropLifecycle.js, pests.js (seed data)
-│   ├── scripts/seed.js            # run once to populate the Pest collection
-│   └── uploads/                   # uploaded pest photos land here
-│
-├── ai-service/                    # Python FastAPI — serves your 3 trained models
-│   ├── app.py                     # /predict endpoint
-│   ├── models.py                  # ResNet18/MobileNetV2 architecture builders
-│   ├── class_names.py             # class label lists (chilli needs a check — see below)
-│   ├── models/                    # <- 3 .pt files here(one per crop-total3)
-│   └── README.md                  # detailed setup + troubleshooting for this piece
-│
-└── client/                        # React (Vite) frontend
-    └── src/
-        ├── api/axios.js           # pre-configured axios instance
-        ├── context/AuthContext.jsx
-        ├── components/            # Navbar, ProtectedRoute
-        └── pages/                 # Login, Register, Dashboard, CreateFarm,
-                                    # CropLifecycle, ReportPest, MyReports, AdminPanel
+├── client/       React 18 + Vite application
+│   └── src/
+│       ├── api/         Axios API client
+│       ├── components/  Shared navigation, dialogs, maps, and dashboard layout
+│       ├── context/     Authentication context
+│       └── pages/       Landing, auth, farmer, admin, map, and activity pages
+├── server/       Express API and MongoDB models
+│   ├── config/    Database connection
+│   ├── controllers/
+│   ├── middleware/
+│   ├── models/
+│   ├── routes/
+│   ├── scripts/  Admin bootstrap and seed scripts
+│   └── uploads/  Uploaded report images (local development)
+└── ai-service/   FastAPI image prediction service (optional)
+    └── models/   Trained model files and class_names.json
+```
 
-This mirrors PestShield doc's module list (Auth, Farm Management, Crop
-Lifecycle, Pest Library, Pest Reporting, Admin Panel) — each module is its
-own model/controller/route file, so adding Maps, Notifications, or Outbreak
-Detection later means adding new files in the same pattern, not restructuring
-anything.
+## Requirements
 
-AI_SERVICE_URL=http://localhost:8000
+- Node.js and npm (the client uses Vite; the API requires Node.js).
+- A MongoDB instance. The server validates the selected environment's database name.
+- Python 3.10+ and pip if you want to run the AI service.
+- The trained model files if you want AI predictions; see [ai-service/README.md](ai-service/README.md).
 
-## Step 1 — Get a MongoDB connection string (5 min)
+## Configuration
 
-1. Go to [mongodb.com/cloud/atlas](https://www.mongodb.com/cloud/atlas), sign up free, create a free (M0) cluster.
-2. Database Access → add a user with a password.
-3. Network Access → Add IP Address → Allow access from anywhere (0.0.0.0/0) — demo.
-4. Connect → Drivers → copy the connection string (looks like `mongodb+srv://user:pass@cluster0.xxx.mongodb.net/`).
-username: shafqatf_db_user
-password: LSRIlKDtvhNnE3vv
-connection string: mongodb+srv://shafqatf_db_user:LSRIlKDtvhNnE3vv@cluster0.onsavyv.mongodb.net/pestshield?appName=Cluster0
-code:
+### API server
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
-const uri = "mongodb+srv://shafqatf_db_user:LSRIlKDtvhNnE3vv@cluster0.onsavyv.mongodb.net/?appName=Cluster0";
+The API loads one of `server/.env.demo` or `server/.env.real`. `PESTSHIELD_MODE` selects which file is loaded; it defaults to `demo` when the environment variable is unset. The database name in `MONGO_URI` must be `pestshield_demo` in demo mode or `pestshield_real` in real mode. The server exits if the selected database name does not match.
 
-// Create a MongoClient with a MongoClientOptions object to set the Stable API version
-const client = new MongoClient(uri, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  }
-});
+Create the environment file you intend to use from the template, then fill in local values:
 
-async function run() {
-  try {
-    // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
-    // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
-  } finally {
-    // Ensures that the client will close when you finish/error
-    await client.close();
-  }
-}
-run().catch(console.dir);
+```powershell
+Copy-Item server/.env.example server/.env.demo
+```
 
-## Step 2 — Backend setup
+Set `MONGO_URI` to your MongoDB connection string for the selected PestShield database and set `JWT_SECRET` to a long, private random value. Set `CLIENT_URL` to the client origin (normally `http://localhost:5173`). For the initial administrator account, set `ADMIN_NAME`, `ADMIN_EMAIL`, and `ADMIN_PASSWORD`; the server bootstrap creates the administrator only when one does not already exist. `AI_SERVICE_URL` is optional and defaults to `http://localhost:8000`.
 
-bash
+Do not commit `.env` files or real credentials. The server ignores `.env`; keep mode-specific files private as well. Use separate credentials and databases for demo and real environments.
+
+### Client
+
+The client reads `VITE_API_URL` at build/start time. Copy the template and point it at the API:
+
+```powershell
+Copy-Item client/.env.example client/.env
+```
+
+```env
+VITE_API_URL=http://localhost:5000/api
+```
+
+The client defaults to that API URL when `VITE_API_URL` is not set.
+
+### AI service
+
+The Node API forwards prediction requests to `AI_SERVICE_URL` (default `http://localhost:8000`). The browser talks to the Node API, not directly to FastAPI. Put the trained model files and `class_names.json` under `ai-service/models/`. The model filenames currently expected by the service are `groundnut_mobilenet_v2.pt`, `potato_mobilenet_v2.pt`, and `chilli_mobilenet_v2.pt`. Full model setup and troubleshooting is in [ai-service/README.md](ai-service/README.md).
+
+## Run locally
+
+Install JavaScript dependencies once in each application directory:
+
+```powershell
 cd server
 npm install
-copy .env.example .env
-
-
-Open `.env` and fill in:
-- `MONGO_URI` — the connection string from Step 1, with `/pestshield` added before the `?` (this becomes your database name)
-- `JWT_SECRET` — any long random string, e.g. mash the keyboard for 40 characters
-
-npm run dev > CTRL C then 
-Seed the pest library (run once):
-bash
-npm run seed
-
-result shoud be `Seeded 11 pests.`
-
-Start the API:
-bash
-npm run dev
-
-You should see `MongoDB connected` and `PestShield API running on port 5000`.
-
-Quick check: open `http://localhost:5000/api/health` in a browser — should show `{"status":"ok"}`.
-
-## Step 3 — Frontend setup
-
-Open a second terminal:
-
-bash
-cd client
+cd ../client
 npm install
-copy .env.example .env
+```
+
+For local development, start the API and client in separate terminals from the project root:
+
+```powershell
+cd server
 npm run dev
+```
 
-Open `http://localhost:5173` — you should see the PestShield login page.
+```powershell
+cd client
+npm run dev
+```
 
-## Step 4 — Walk through the demo flow once yourself, tonight
+The API runs on port `5000` by default; the Vite client runs on port `5173`. Check API availability at `http://localhost:5000/api/health` (expected response: `{"status":"ok"}`). Open `http://localhost:5173` for the website.
 
-1. Register as a farmer (name/email/password).
-2. On the Dashboard, click + Add Farm → name it, pick a crop (Groundnut/Potato/Chilli) → Create.
-3. Click your farm to view its Crop Lifecycle (day-by-day stages).
-4. Go to Report Pest → select the farm, pick severity, attach a leaf photo, submit.
-5. Go to My Reports → see your report with status "Pending".
-6. Register a second account with role = Admin.
-7. Log in as that admin → go to Admin in the navbar → see the pending report → click Verify.
-8. Log back in as the farmer → My Reports now shows "Verified".
+To run the API in real mode, select it in the environment before starting the server. In PowerShell:
 
+```powershell
+$env:PESTSHIELD_MODE = 'real'
+cd server
+npm run dev
+```
 
-## Where the AI model plugs in later
+In bash:
 
-- `PestReport` already has `aiPredictedPest`, `aiConfidence`, `detectionMethod` fields — no migration needed.
-- `client/src/pages/ReportPest.jsx` has a clearly marked comment showing exactly where to call the prediction endpoint and show the suggestion.
-- Add a new `server/routes/pestDetectionRoutes.js` that forwards the uploaded image to the FastAPI microservice (see PestShield Chapter 13) and returns `{predicted_class, confidence}` — this is additive, it won't touch any existing file.
+```bash
+export PESTSHIELD_MODE=real
+cd server
+npm run dev
+```
 
+Ensure `server/.env.real` points to the `pestshield_real` database. For demo mode, leave `PESTSHIELD_MODE` unset or set it to `demo`; configure `server/.env.demo` for `pestshield_demo`.
 
+### Optional AI service
 
-- "MongoDB connection error" → check `.env` has the real password (not `<password>`) and that Network Access allows your current IP (or 0.0.0.0/0).
-- CORS error in browser console → check `CLIENT_URL` in `server/.env` matches the URL you're actually opening (`http://localhost:5173`).
-- Image upload fails → check the `server/uploads` folder exists (it should, it's already in this project).
-- Blank page on frontend → check both `npm run dev` terminals are still running; check browser console for the actual error.
+From a third terminal:
+
+```powershell
+cd ai-service
+python -m venv venv
+venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+python -m uvicorn app:app --reload --port 8000
+```
+
+On macOS/Linux, activate the environment with `source venv/bin/activate`. The AI service exposes `GET /health` and `POST /predict`; the application calls prediction through the authenticated Node route `POST /api/pest-detection/predict`.
+
+## Main application routes
+
+| Route | Access | Purpose |
+| --- | --- | --- |
+| `/` | Public | Landing page |
+| `/login` | Public | Sign in |
+| `/register` | Public | Create a farmer account |
+| `/dashboard` | Farmer or admin | Role-specific dashboard |
+| `/create-farm` | Farmer | Add a farm |
+| `/crop-lifecycle/:crop` | Signed-in user | Crop lifecycle information |
+| `/report-pest` | Farmer | Submit a pest report and photo |
+| `/my-reports` | Farmer | Review personal reports |
+| `/activities` | Farmer | Manage field activities |
+| `/map` | Signed-in user | View outbreak map |
+| `/admin` | Admin | Review and manage pest reports |
+| `/admin/users` | Admin | Manage users |
+| `/admin/pests` | Admin | Manage pest library entries |
+
+The API has a health check at `GET /api/health`. The API route groups are mounted under `/api`: `/auth`, `/farms`, `/pests`, `/pest-reports`, `/pest-detection`, `/alerts`, `/admin/users`, `/map`, `/activities`, `/dashboard`, and `/weather`. Authentication uses bearer tokens; the client attaches the stored token to API requests.
+
+## Seed data and administrator account
+
+The server bootstraps the first administrator from the selected environment's `ADMIN_NAME`, `ADMIN_EMAIL`, and `ADMIN_PASSWORD` if an administrator does not already exist. The pest seed command is intentionally restricted to the demo database:
+
+```powershell
+cd server
+npm run seed
+```
+
+Do not run the seed script expecting it to populate a real database; it refuses non-demo databases.
+
+## Build the client
+
+```powershell
+cd client
+npm run build
+```
+
+To serve the generated production build locally:
+
+```powershell
+npm run preview
+```
+
+## Security and operational notes
+
+- Never commit database URIs, JWT secrets, administrator passwords, or populated environment files.
+- Use a unique, strong `JWT_SECRET` and restrict `CLIENT_URL` to the deployed frontend origin in production.
+- Uploaded photos are stored by the API under `server/uploads` in the current configuration. Use persistent storage and appropriate backups when deploying.
+- The API periodically checks and expires outdated outbreak alerts.
+- The AI service requires compatible trained model files; without them, AI prediction cannot be used, though the rest of the application can run.
+
+## Troubleshooting
+
+- **MongoDB connection/database mismatch:** verify the selected mode, that its environment file exists, and that the URI uses `pestshield_demo` or `pestshield_real` as appropriate.
+- **Missing JWT secret:** set `JWT_SECRET` in the selected server environment file.
+- **Browser CORS error:** set `CLIENT_URL` to the exact client origin, including scheme and port.
+- **AI prediction unavailable:** start FastAPI, confirm `AI_SERVICE_URL`, and check that all crop model files and `class_names.json` are in `ai-service/models/`.
+- **Image upload fails:** confirm the API can write to `server/uploads` and that the request is made through the API.
+- **Client cannot reach the API:** verify the server is running and `VITE_API_URL` points to its `/api` base URL.
+
