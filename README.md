@@ -41,6 +41,32 @@ pestshield-app/
 - Python 3.10+ and pip if you want to run the AI service.
 - The trained model files if you want AI predictions; see [ai-service/README.md](ai-service/README.md).
 
+## Quick start
+
+This starts the website and API in local demo mode. You need a MongoDB connection string for a database named `pestshield_demo`.
+
+1. Configure `server/.env.demo` with `MONGO_URI`, `JWT_SECRET`, `CLIENT_URL`, and the initial admin values (`ADMIN_NAME`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`). The server's environment files are private and should not be committed. If you are creating the file for the first time, use `server/.env.example` as a template and add `PESTSHIELD_MODE=demo` and `AI_SERVICE_URL=http://localhost:8000` if needed.
+2. In a terminal, install and start the API:
+
+   ```powershell
+   cd server
+   npm install
+   npm run dev
+   ```
+
+3. In a second terminal, install and start the website:
+
+   ```powershell
+   cd client
+   npm install
+   Copy-Item .env.example .env
+   npm run dev
+   ```
+
+4. Open `http://localhost:5173`. Confirm the API is running at `http://localhost:5000/api/health`.
+
+AI image predictions are optional. To enable them, configure the model files as described in [ai-service/README.md](ai-service/README.md), then start the Python service in a third terminal using the instructions under [Optional AI service](#optional-ai-service).
+
 ## Configuration
 
 ### API server
