@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import L from 'leaflet';
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import {
   MapContainer,
   TileLayer,
@@ -161,7 +162,6 @@ function calculateWeatherRisk(weather) {
   let score = 0;
   const reasons = [];
 
-  // Illustrative screening rules, not a validated pest model.
   if (humidity >= 85) {
     score += 2;
     reasons.push('Very high humidity');
@@ -246,6 +246,7 @@ function FarmWeather({ farmId }) {
 
     return () => controller.abort();
   }, [farmId]);
+
   const weatherRisk = calculateWeatherRisk(weather);
   const displayValue = (value, unit) => {
     return typeof value === 'number' &&
@@ -309,51 +310,51 @@ function FarmWeather({ farmId }) {
             {displayValue(weather.windSpeed, ' km/h')}
           </div>
           
-{weatherRisk && (
-  <div
-    style={{
-      marginTop: 12,
-      padding: 10,
-      borderRadius: 8,
-      background: weatherRisk.background,
-      border: `1px solid ${weatherRisk.color}`
-    }}
-  >
-    <div
-      style={{
-        fontSize: 13,
-        fontWeight: 700,
-        color: weatherRisk.color
-      }}
-    >
-      Weather-based pest risk: {weatherRisk.level}
-    </div>
+          {weatherRisk && (
+            <div
+              style={{
+                marginTop: 12,
+                padding: 10,
+                borderRadius: 8,
+                background: weatherRisk.background,
+                border: `1px solid ${weatherRisk.color}`
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 13,
+                  fontWeight: 700,
+                  color: weatherRisk.color
+                }}
+              >
+                Weather-based pest risk: {weatherRisk.level}
+              </div>
 
-    <div
-      style={{
-        fontSize: 12,
-        color: '#445',
-        marginTop: 5
-      }}
-    >
-      {weatherRisk.reasons.length > 0
-        ? weatherRisk.reasons.join(' · ')
-        : 'No elevated conditions detected by these rules'}
-    </div>
+              <div
+                style={{
+                  fontSize: 12,
+                  color: '#445',
+                  marginTop: 5
+                }}
+              >
+                {weatherRisk.reasons.length > 0
+                  ? weatherRisk.reasons.join(' · ')
+                  : 'No elevated conditions detected by these rules'}
+              </div>
 
-    <div
-      style={{
-        fontSize: 11,
-        color: '#667',
-        marginTop: 7
-      }}
-    >
-      Preliminary weather screening only.
-      Not a confirmed pest outbreak or validated
-      crop-specific prediction.
-    </div>
-  </div>
-)}
+              <div
+                style={{
+                  fontSize: 11,
+                  color: '#667',
+                  marginTop: 7
+                }}
+              >
+                Preliminary weather screening only.
+                Not a confirmed pest outbreak or validated
+                crop-specific prediction.
+              </div>
+            </div>
+          )}
 
           <div
             style={{
@@ -383,26 +384,117 @@ function FarmWeather({ farmId }) {
   );
 }
 
-function FitBounds({ points }) {
+
+function FitBounds({
+  points,
+  zones,
+  showZones,
+  crop,
+  days,
+  loading,
+  data
+}) {
   const map = useMap();
-  const hasInitiallyFitted = useRef(false);
+  const lastFitKey = useRef(null);
 
   useEffect(() => {
-    if (hasInitiallyFitted.current || points.length === 0) {
-      return;
-    }
+    if (loading || !data) return;
 
-    if (points.length === 1) {
-      map.setView(points[0], 11);
+    const validZones = showZones
+      ? zones.filter(
+          (zone) =>
+            hasValidCoordinates(zone) &&
+            Number.isFinite(Number(zone.properties?.radiusKm)) &&
+            Number(zone.properties.radiusKm) > 0
+        )
+      : [];
+
+    const bounds = L.latLngBounds([]);
+
+    if (validZones.length > 0) {
+      validZones.forEach((zone) => {
+        const [longitude, latitude] =
+          zone.geometry.coordinates;
+
+        const radiusMetres =
+          Number(zone.properties.radiusKm) * 1000;
+
+        const latitudeOffset = radiusMetres / 111320;
+
+        const longitudeOffset =
+          radiusMetres /
+          (111320 *
+            Math.max(
+              Math.abs(Math.cos(latitude * Math.PI / 180)),
+              0.000001
+            ));
+
+        bounds.extend([
+          latitude - latitudeOffset,
+          longitude - longitudeOffset
+        ]);
+
+        bounds.extend([
+          latitude + latitudeOffset,
+          longitude + longitudeOffset
+        ]);
+      });
     } else {
-      map.fitBounds(points, {
-        padding: [40, 40],
-        maxZoom: 12
+      points.forEach((point) => {
+        if (
+          Array.isArray(point) &&
+          point.length === 2 &&
+          Number.isFinite(point[0]) &&
+          Number.isFinite(point[1])
+        ) {
+          bounds.extend(point);
+        }
       });
     }
 
-    hasInitiallyFitted.current = true;
-  }, [points, map]);
+    if (!bounds.isValid()) return;
+
+    const fitKey = JSON.stringify({
+      crop,
+      days,
+      showZones,
+      zones: validZones.map((zone) => ({
+        id: zone.properties?.id,
+        coordinates: zone.geometry.coordinates,
+        radiusKm: zone.properties?.radiusKm
+      })),
+      points: validZones.length === 0 ? points : []
+    });
+
+    if (lastFitKey.current === fitKey) return;
+
+    lastFitKey.current = fitKey;
+
+    if (validZones.length > 0) {
+      map.fitBounds(bounds, {
+        padding: [65, 65],
+        maxZoom: 14,
+        animate: true
+      });
+    } else if (points.length === 1) {
+      map.setView(points[0], 11);
+    } else {
+      map.fitBounds(bounds, {
+        padding: [40, 40],
+        maxZoom: 12,
+        animate: true
+      });
+    }
+  }, [
+    map,
+    points,
+    zones,
+    showZones,
+    crop,
+    days,
+    loading,
+    data
+  ]);
 
   return null;
 }
@@ -428,7 +520,6 @@ export default function MapPage() {
 
   const [selected, setSelected] = useState(null);
 
-  // Close report or outbreak details with Escape.
   useEffect(() => {
     const onKey = (event) => {
       if (event.key === 'Escape') {
@@ -443,12 +534,12 @@ export default function MapPage() {
     };
   }, []);
 
-  // Existing outbreak and report data.
   useEffect(() => {
     const controller = new AbortController();
 
     setLoading(true);
     setError('');
+    setData(null);
 
     api
       .get('/map/data', {
@@ -483,8 +574,6 @@ export default function MapPage() {
     return () => controller.abort();
   }, [crop, days]);
 
-  // NEW: Fetch registered farm locations only when
-  // the administrator enables the Farms layer.
   useEffect(() => {
     if (!showFarms) return;
 
@@ -536,8 +625,6 @@ export default function MapPage() {
     [data]
   );
 
-  // Farm crop filter applies to the Farms layer too.
-  // The date filter applies only to reports/outbreaks.
   const visibleFarms = useMemo(() => {
     if (!showFarms) return [];
 
@@ -549,8 +636,6 @@ export default function MapPage() {
     });
   }, [farms, crop, showFarms]);
 
-  // GeoJSON uses [longitude, latitude].
-  // Leaflet uses [latitude, longitude].
   const points = useMemo(() => {
     const visibleFeatures = [
       ...(showReports ? reports : []),
@@ -597,7 +682,6 @@ export default function MapPage() {
         <div style={styles.error}>{farmsError}</div>
       )}
 
-      {/* Existing statistics */}
       <div style={styles.stats}>
         <div style={styles.stat}>
           <div style={styles.statNum}>
@@ -632,7 +716,6 @@ export default function MapPage() {
         </div>
       </div>
 
-      {/* Map controls */}
       <div style={styles.bar}>
         <select
           style={styles.select}
@@ -688,7 +771,6 @@ export default function MapPage() {
           Reports
         </label>
 
-        {/* NEW: Registered farms toggle */}
         <label style={styles.check}>
           <input
             type="checkbox"
@@ -712,7 +794,6 @@ export default function MapPage() {
         )}
       </div>
 
-      {/* Main map */}
       <div style={styles.mapWrap}>
         <MapContainer
           center={[20.5937, 78.9629]}
@@ -732,7 +813,6 @@ export default function MapPage() {
             cursor: 'grab'
           }}
         >
-          {/* Street / Satellite imagery */}
           {mapView === 'street' ? (
             <TileLayer
               key="street"
@@ -749,9 +829,16 @@ export default function MapPage() {
             />
           )}
 
-          <FitBounds points={points} />
+          <FitBounds
+            points={points}
+            zones={zones}
+            showZones={showZones}
+            crop={crop}
+            days={days}
+            loading={loading}
+            data={data}
+          />
 
-          {/* Existing outbreak zones */}
           {showZones &&
             zones
               .filter(hasValidCoordinates)
@@ -770,28 +857,47 @@ export default function MapPage() {
                     String(properties.id);
 
                 return (
-                  <Circle
-                    key={properties.id}
-                    center={[latitude, longitude]}
-                    radius={properties.radiusKm * 1000}
-                    pathOptions={{
-                      color,
-                      fillColor: color,
-                      fillOpacity: isSelected ? 0.3 : 0.18,
-                      weight: isSelected ? 4 : 2
-                    }}
-                    eventHandlers={{
-                      click: () =>
-                        setSelected({
-                          type: 'zone',
-                          id: properties.id
-                        })
-                    }}
-                  />
+                  <Fragment key={properties.id}>
+                    <Circle
+                      center={[latitude, longitude]}
+                      radius={properties.radiusKm * 1000}
+                      pathOptions={{
+                        color,
+                        fillColor: color,
+                        fillOpacity: isSelected ? 0.35 : 0.22,
+                        weight: isSelected ? 5 : 3,
+                        opacity: 1
+                      }}
+                      eventHandlers={{
+                        click: () =>
+                          setSelected({
+                            type: 'zone',
+                            id: properties.id
+                          })
+                      }}
+                    />
+
+                    <CircleMarker
+                      center={[latitude, longitude]}
+                      radius={50}
+                      pathOptions={{
+                        color,
+                        fillColor: color,
+                        fillOpacity: 0.18,
+                        weight: 3
+                      }}
+                      eventHandlers={{
+                        click: () =>
+                          setSelected({
+                            type: 'zone',
+                            id: properties.id
+                          })
+                      }}
+                    />
+                  </Fragment>
                 );
               })}
 
-          {/* Existing verified report markers */}
           {showReports &&
             reports
               .filter(hasValidCoordinates)
@@ -809,7 +915,7 @@ export default function MapPage() {
                   <CircleMarker
                     key={properties.id}
                     center={[latitude, longitude]}
-                    radius={isSelected ? 11 : 7}
+                    radius={isSelected ? 8 : 5}
                     pathOptions={{
                       color: isSelected
                         ? '#1f2a1f'
@@ -831,7 +937,6 @@ export default function MapPage() {
                 );
               })}
 
-          {/* NEW: Registered farm markers */}
           {showFarms &&
             visibleFarms.map((farm) => {
               const isFarmSelected =
@@ -912,8 +1017,8 @@ export default function MapPage() {
                       >
                         Coordinates are user-provided
                         and are not independently verified.
-                       </div>
-                        <FarmWeather farmId={farm.id} />
+                      </div>
+                      <FarmWeather farmId={farm.id} />
                     </div>
                   </Popup>
                 </CircleMarker>
@@ -921,7 +1026,6 @@ export default function MapPage() {
             })}
         </MapContainer>
 
-        {/* Existing report/outbreak detail panel */}
         <MapDetailPanel
           selected={selected}
           zones={zones}
@@ -931,7 +1035,6 @@ export default function MapPage() {
         />
       </div>
 
-      {/* Legend */}
       <div style={styles.legend}>
         <span>
           <span style={styles.dot(RISK_COLORS.Low)} />
