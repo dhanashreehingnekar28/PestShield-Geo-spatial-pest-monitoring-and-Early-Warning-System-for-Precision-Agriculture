@@ -1,5 +1,6 @@
 const Alert = require('../models/Alert');
 const fs = require('fs');
+const { persistUpload, removeUpload } = require('../services/imageStorage');
 const PestReport = require('../models/PestReport');
 const Farm = require('../models/Farm');
 const Pest = require('../models/Pest');
@@ -15,7 +16,7 @@ const {
 const { haversineDistanceKm } = require('../utils/geo');
 const { buildRecommendedActions } = require('../utils/recommendations');
 
-const discardUpload = (file) => { if (file) fs.unlink(file.path, () => {}); };
+const discardUpload = (file) => { if (file) removeUpload(`/uploads/${file.filename}`).catch(console.error); };
 
 const createReport = async (req, res) => {
   try {
@@ -85,6 +86,7 @@ const createReport = async (req, res) => {
       }
     }
 
+    await persistUpload(req.file);
     const report = await PestReport.create({
       farmer: req.user._id,
       farm,

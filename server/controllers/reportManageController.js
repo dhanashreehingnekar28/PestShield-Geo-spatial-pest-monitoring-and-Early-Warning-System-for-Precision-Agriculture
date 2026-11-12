@@ -87,8 +87,7 @@ const deleteReport = async (req, res) => {
 
     // Remove the uploaded photo too (only if it really lives inside the uploads folder)
     if (report.image) {
-      const filePath = path.join(__dirname, '..', report.image);
-      if (filePath.startsWith(UPLOADS_DIR)) fs.unlink(filePath, () => {});
+      await require('../services/imageStorage').removeUpload(report.image);
     }
 
     await report.deleteOne();
